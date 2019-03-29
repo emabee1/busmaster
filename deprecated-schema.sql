@@ -1,3 +1,6 @@
+create user bus_master WITH (password = 'bus_master');
+GRANT ALL TO bus_master;
+
 CREATE TABLE IF NOT EXISTS bus_master.category
     (
         category STRING, -- PRIMARY KEY
