@@ -9,21 +9,25 @@ public class BusModel {
     @Id
     @Column(name = "bus_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int _busId;
+    private Long _busId;
+
     @Column(name = "capacity")
     private int _capacity;
+
     @Column(name = "seats")
     private int _seats;
+
     @Column(name = "operational_area")
     private String _operationalArea;
+
     @Column(name = "current_km")
     private int _currentKm;
 
-    public int getBusId() {
+    public Long getBusId() {
         return _busId;
     }
 
-    public void setBusId(int busId) {
+    public void setBusId(Long busId) {
         _busId = busId;
     }
 
