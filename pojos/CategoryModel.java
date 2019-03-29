@@ -14,6 +14,7 @@ public class CategoryModel {
     @Id
     @Column(name = "category")
     private String _category;
+
     @Column(name = "description")
     private String _description;
 

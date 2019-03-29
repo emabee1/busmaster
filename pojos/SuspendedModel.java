@@ -10,21 +10,25 @@ public class SuspendedModel {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "suspended_id")
-    private int _suspendedId;
+    private Long _suspendedId;
+
     @ManyToOne
     private BusModel _busModel;
+
     @Column(name = "startdate")
     private LocalDate _startDate;
+
     @Column(name = "enddate")
     private LocalDate _endDate;
+
     @Column(name = "cause")
     private String _cause;
 
-    public int getSuspendedId() {
+    public Long getSuspendedId() {
         return _suspendedId;
     }
 
-    public void setSuspendedId(int suspendedId) {
+    public void setSuspendedId(Long suspendedId) {
         _suspendedId = suspendedId;
     }
 
