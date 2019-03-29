@@ -9,9 +9,9 @@ import javax.persistence.*;
 @Table(name = "station")
 public class StationModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "station_id", updatable = false, nullable = false)
-    private String _stationId;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "station_id")
+    private Long _stationId;
     @Column(name = "name")
     private String _name;
     @Column(name = "location_description")
