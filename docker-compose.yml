@@ -1,0 +1,14 @@
+version: "3.5"
+services:
+  postres:
+    image: postgres:11.2
+    container_name: bus_master_db
+    environment:
+      POSTGRES_USER: bus_master
+      POSTGRES_PASSWORD: bus_master
+      POSTGRES_DB: bus_master
+    volumes:
+    - ./data:/var/lib/postgresql/data
+    ports:
+    - "5432:5432"
+    restart: unless-stopped
