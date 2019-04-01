@@ -63,7 +63,7 @@ create table if not exists start_time (
     start_time_id serial,
     category_start_time_id integer,
     start_time time,
-    required_capactiy integer,
+    required_capacity integer,
     primary key (start_time_id),
     foreign key (category_start_time_id) references category_start_times(category_start_time_id)
 );
