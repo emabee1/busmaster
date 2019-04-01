@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS station (
 
 create table if not exists bus (
     bus_id serial,
-	licence_plate_number, varchar(7),
+    licence_plate_number varchar(7),
     capacity integer,
     seats integer,
     operational_area varchar(255),
