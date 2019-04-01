@@ -1,9 +1,9 @@
-package POJOs;
+package pojos;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "path")
+@Table(name = "paths")
 public class PathModel {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
