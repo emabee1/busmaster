@@ -97,6 +97,7 @@ create table if not exists path_station (
     time_from_previous integer,
     primary key (path_station_id),
     foreign key (path_id) references paths(path_id)
+    foreign key (station_id) references station(station_id)
 );
 
 
