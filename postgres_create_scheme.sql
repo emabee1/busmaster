@@ -18,9 +18,8 @@ create table if not exists bus (
     constraint capacity_gt_zero check (capacity >= 0)
 );
 
-/*
-    enum or own table..?
-*/
+
+--enum or own table..?
 create type category AS enum ('workday', 'schoolday', 'saturday', 'sunday_holiday');
 
 
@@ -96,7 +95,7 @@ create table if not exists path_station (
     distance_from_previous integer,
     time_from_previous integer,
     primary key (path_station_id),
-    foreign key (path_id) references paths(path_id)
+    foreign key (path_id) references path(path_id),
     foreign key (station_id) references station(station_id)
 );
 
@@ -109,6 +108,6 @@ create table if not exists route_ride (
     primary key (route_ride_id),
     foreign key (shift_day_id) references shift_day(shift_day_id),
     foreign key (start_time_id) references start_time(start_time_id),
-    foreign key (path_id) references paths(path_id)
+    foreign key (path_id) references path(path_id)
 );
 
