@@ -78,7 +78,7 @@ create table if not exists route (
     foreign key (timetable_id) references timetable(timetable_id)
 );
 
-create table if not exists paths (
+create table if not exists path (
     path_id serial,
     category_start_time_id integer,
     route_id integer,
