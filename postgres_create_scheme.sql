@@ -19,9 +19,14 @@ create table if not exists bus (
 );
 
 
---enum or own table..?
-create type category AS enum ('workday', 'schoolday', 'saturday', 'sunday_holiday');
+create table if not exists category (
+    category_id serial,
+    name varchar(255) not null,
+    primary key (category_id)
+);
 
+insert into category(name)
+values('workday'), ('schoolday'), ('saturday'), ('sunday_holiday');
 
 create table if not exists timetable (
     timetable_id serial,
@@ -36,9 +41,10 @@ create table if not exists shift_day (
     shift_day_id serial,
     bus_id integer,
     shift_date date,
-    shift_category category,
+    category_id integer,
     primary key (shift_day_id),
-    foreign key (bus_id) references bus(bus_id)
+    foreign key (bus_id) references bus(bus_id),
+    foreign key (category_id) references category(category_id)
 );
 
 create table if not exists suspension (
@@ -54,8 +60,9 @@ create table if not exists suspension (
 
 create table if not exists category_start_times (
     category_start_time_id serial,
-    category_name category,
-    primary key (category_start_time_id)
+    category_id integer,
+    primary key (category_start_time_id),
+    foreign key (category_id) references category(category_id)
 );
 
 create table if not exists start_time (
