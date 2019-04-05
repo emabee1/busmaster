@@ -106,7 +106,7 @@ values (
        );
 
 
--- reuse hift_day configuration of shift day one on 05.05.2019
+-- reuse shift_day configuration of shift day one on 05.05.2019
 -- and apply it to same rides on 06.05.2019 with shift_day id = 2
 update planned_ride
 set shift_day_id = 2
@@ -146,7 +146,7 @@ select generate_rides('5.3.2019', 'workday');
 -- manually assign rides to shift_day 1 (-> use case)
 update planned_ride
 set shift_day_id = 1
-where planned_ride_id = 1 or planned_ride_id = 12;
+where planned_ride_id = 1 or planned_ride_id = 2;
 
 
 
