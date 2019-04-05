@@ -116,7 +116,7 @@ values (
 -- manually assign rides to shift_day 1 (-> use case)
 update planned_ride
 set shift_day_id = 1
-where planned_ride_id = 1 or planned_ride_id = 2;
+where planned_ride_id = 11 or planned_ride_id = 12;
 
 
 -- create another shift for 06.05.2019 with bus1 (shift_day_id = 2)
@@ -136,13 +136,14 @@ where (path_ride_id in (select path_ride_id from planned_ride P where P.shift_da
 
 
 -- show all planned rides with details
-select planned_ride_id, planned_ride.date, path.path_description, start_time, required_capacity, name as category, bus.bus_id, licence_plate_number
+select planned_ride_id, planned_ride.date, path.path_description, start_time, required_capacity, name as category, planned_ride.shift_day_id, bus.bus_id, licence_plate_number
 from planned_ride
   inner join timetable on planned_ride.path_ride_id = timetable.path_ride_id
   inner join category on category.category_id = timetable.category_id
   inner join path on timetable.path_id = path.path_id
   left outer join shift_day on planned_ride.shift_day_id = shift_day.shift_day_id
-  left outer join bus on shift_day.bus_id = bus.bus_id;
+  left outer join bus on shift_day.bus_id = bus.bus_id
+  order by planned_ride.date asc;
 
 select * from timetable;
 
@@ -170,14 +171,21 @@ create function apply_shift_day_template(template_shift_day_id integer, new_shif
   AS $$
     update planned_ride
     set shift_day_id = new_shift_day_id
-  where (path_ride_id in (select path_ride_id from planned_ride P where P.shift_day_id = template_shift_day_id)) and date = date_;
+  where (path_ride_id in (select path_ride_id from planned_ride P where P.shift_day_id = template_shift_day_id)) and date = date;
   $$
 language sql;
 
 
 
-select apply_shift_day_template(1, 2, '6.5.2019');
+-- call generate_rides function
+select generate_rides('3.3.2019', 'workday');
+select generate_rides('4.3.2019', 'workday');
+select generate_rides('5.3.2019', 'workday');
+
+
+select apply_shift_day_template(1, 2, '4.3.2019');
 select * from planned_ride;
+
 
 
 
