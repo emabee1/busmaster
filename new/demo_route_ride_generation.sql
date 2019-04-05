@@ -57,13 +57,13 @@ create table if not exists stations_of_path (
 -- where category_id = (select category_id from category where name = 'workday');
 
 create table if not exists timetable (
-    start_id serial,
+    path_ride_id serial,
     category_id integer not null,
     path_id integer not null,
     start_time time not null,
     required_capacity integer,
 
-    primary key (start_id),
+    primary key (path_ride_id),
     foreign key (category_id) references category(category_id),
     foreign key (path_id) references path(path_id)
 );
@@ -99,13 +99,14 @@ create table if not exists shift_day (
 -- save all planned rides (generated from timetable)
 create table if not exists planned_ride (
     planned_ride_id serial,
-    shift_day_id integer,
-    start_id integer,       -- path, start_time and capacity and category can be get from timetable with this id
+    -- this path_ride represents a path + category + start_time + needed capacity
+    path_ride_id integer,       
     date date,
+    shift_day_id integer,
 
     primary key(planned_ride_id),
     foreign key(shift_day_id) references shift_day(shift_day_id),
-    foreign key(start_id) references timetable(start_id)
+    foreign key(path_ride_id) references timetable(path_ride_id)
 );
 
 
