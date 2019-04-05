@@ -39,7 +39,7 @@ create table if not exists path (
 create table if not exists stations_of_path (
     stations_of_path_id serial,
     station_id integer,
-    path_id path,
+    path_id integer,
     distance_from_previous integer,
     time_from_previous integer,
     sort_no integer,        -- used to keep order of path in db
