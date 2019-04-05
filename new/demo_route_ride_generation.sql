@@ -24,7 +24,7 @@ create table if not exists route (
     route_number varchar(255),
     description varchar(255),
 
-    primary key (route_id),
+    primary key (route_id)
 );
 
 insert into route(route_number, description)
@@ -82,60 +82,37 @@ create table if not exists timetable (
     primary key (start_id),
     foreign key (category_id) references category(category_id),
     foreign key (path_id) references path(path_id)
-)
+);
 
 insert into timetable(category_id, path_id, start_time)
 values
     (
-        select category_id from category where name = 'workday',
-        select path_id from path where path_description = 'A -> B -> C', 
+        (select category_id from category where name = 'workday'),
+        (select path_id from path where path_description = 'A -> B -> C'),
         '8:00'
     ),
     (
-        select category_id from category where name = 'workday',
-        select path_id from path where path_description = 'C -> B -> A', 
+        (select category_id from category where name = 'workday'),
+        (select path_id from path where path_description = 'C -> B -> A'),
         '9:00'
     ),
     (
-        select category_id from category where name = 'scholday',
-        select path_id from path where path_description = 'A -> B -> C', 
+        (select category_id from category where name = 'schoolday'),
+        (select path_id from path where path_description = 'A -> B -> C'),
         '7:00'
     ),
     (
-        select category_id from category where name = 'schoolday',
-        select path_id from path where path_description = 'C -> B -> A', 
+        (select category_id from category where name = 'schoolday'),
+        (select path_id from path where path_description = 'C -> B -> A'),
         '8:00'
     );
 
+
+-- generate path rides for workday
 select current_date, * 
 from timetable
 where category_id = (select category_id from category where name = 'workday');
 
-
--- save all planned rides (generated from timetable)
-create table if not exists planned_ride (
-    planned_ride_id serial,
-    shift_day_id integer,
-    path_id integer not null,
-    date date not null,
-    start_time time not null,
-    
-    primary key(planned_route_ride_id),
-    foreign key(shift_day_id) references shift_day(shift_day_id),
-    foreign key(path_id) references path(path_id)
-);
-
-
-
-create table if not exists shift_day (
-    shift_day_id serial,
-    bus_id integer,
-    category_id integer,
-	date date,
-    primary key (shift_day_id),
-    foreign key (bus_id) references bus(bus_id),
-    foreign key (category_id) references category(category_id)
-);
 
 
 create table if not exists bus (
@@ -149,6 +126,31 @@ create table if not exists bus (
     constraint current_km_gt_zero check (current_km >= 0),
     constraint capacity_gt_zero check (capacity >= 0)
 );
+
+create table if not exists shift_day (
+    shift_day_id serial,
+    bus_id integer,
+    category_id integer,
+	date date,
+    primary key (shift_day_id),
+    foreign key (bus_id) references bus(bus_id),
+    foreign key (category_id) references category(category_id)
+);
+
+
+-- save all planned rides (generated from timetable)
+create table if not exists planned_ride (
+    planned_ride_id serial,
+    shift_day_id integer,
+    path_id integer not null,
+    date date not null,
+    start_time time not null,
+    
+    primary key(planned_ride_id),
+    foreign key(shift_day_id) references shift_day(shift_day_id),
+    foreign key(path_id) references path(path_id)
+);
+
 
 create table if not exists suspension (
     suspended_id serial,
