@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS station (
 
 create table if not exists route (
     route_id serial,
-    route_number varchar(255),
+    route_number varchar(255) not null,
     description varchar(255),
 
     primary key (route_id)
@@ -25,8 +25,8 @@ create table if not exists route (
 -- path belongs to exactly one route, easier than 1 to n
 create table if not exists path (
     path_id serial,
-    route_id integer,
-    category_id integer,
+    route_id integer not null,
+    category_id integer not null,    --needed because a path might be different depending on workday / schoolday / ..
     path_description varchar(255),
 
     primary key (path_id),
@@ -90,10 +90,6 @@ create table if not exists shift_day (
     foreign key (bus_id) references bus(bus_id),
     foreign key (category_id) references category(category_id)
 );
-
--- UNTIL HERE OK
---------------------------------------------------------------------------------------
-
 
 
 -- save all planned rides (generated from timetable)

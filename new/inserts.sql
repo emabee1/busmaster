@@ -136,11 +136,12 @@ where (path_ride_id in (select path_ride_id from planned_ride P where P.shift_da
 
 
 -- show all planned rides with details
-select planned_ride_id, planned_ride.date, path.path_description, start_time, required_capacity, name as category, planned_ride.shift_day_id, bus.bus_id, licence_plate_number
+select planned_ride_id, planned_ride.date, route.route_number, path.path_description, start_time, required_capacity, name as category, planned_ride.shift_day_id, bus.bus_id, licence_plate_number
 from planned_ride
   inner join timetable on planned_ride.path_ride_id = timetable.path_ride_id
   inner join category on category.category_id = timetable.category_id
   inner join path on timetable.path_id = path.path_id
+  inner join route on path.route_id = route.route_id
   left outer join shift_day on planned_ride.shift_day_id = shift_day.shift_day_id
   left outer join bus on shift_day.bus_id = bus.bus_id
   order by planned_ride.date asc;
