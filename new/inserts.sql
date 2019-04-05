@@ -145,3 +145,22 @@ from planned_ride
   left outer join bus on shift_day.bus_id = bus.bus_id;
 
 select * from timetable;
+
+
+
+-- first param: date, second: category_name
+create function generate_rides(in date, in text) returns void
+  AS $$
+    insert into planned_ride(path_ride_id, date, shift_day_id)
+    select path_ride_id, $1 as date, null as shift_day_id
+    from timetable inner join path on timetable.path_id = path.path_id
+    where timetable.category_id = (select category_id from category where name = $2);
+  $$
+language sql;
+
+
+-- call generate_rides function
+select generate_rides('3.3.2019', 'workday');
+
+-- show all planed rides
+select * from planned_ride;
