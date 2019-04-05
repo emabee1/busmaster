@@ -100,12 +100,12 @@ create table if not exists shift_day (
 create table if not exists planned_ride (
     planned_ride_id serial,
     shift_day_id integer,
-    path_id integer not null,
-    start_time time not null,
-    
+    start_id integer,       -- path, start_time and capacity and category can be get from timetable with this id
+    date date,
+
     primary key(planned_ride_id),
     foreign key(shift_day_id) references shift_day(shift_day_id),
-    foreign key(path_id) references path(path_id)
+    foreign key(start_id) references timetable(start_id)
 );
 
 
