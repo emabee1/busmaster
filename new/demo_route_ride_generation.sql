@@ -15,9 +15,6 @@ CREATE TABLE IF NOT EXISTS station (
     primary key (station_id)
 );
 
-insert into station(station_name)
-values ('A'), ('B'), ('C');
-
 
 create table if not exists route (
     route_id serial,
@@ -27,9 +24,6 @@ create table if not exists route (
     primary key (route_id)
 );
 
-insert into route(route_number, description)
-values
-    ('Route 1', 'A -> B -> C and back');
 
 -- path belongs to exactly one route, easier than 1 to n
 create table if not exists path (
@@ -42,10 +36,7 @@ create table if not exists path (
     foreign key (route_id) references route(route_id)
 );
 
-insert into path(route_id, category_id, path_description)
-values 
-    (1, 1, 'A -> B -> C'),
-    (1, 1, 'C -> B -> A');
+
 
 
 -- select * from stations_of_path
@@ -54,18 +45,18 @@ values
 create table if not exists stations_of_path (
     stations_of_path_id serial,
     station_id integer,
+    path_id path,
     distance_from_previous integer,
     time_from_previous integer,
     sort_no integer,        -- used to keep order of path in db
     primary key (stations_of_path_id),
-    foreign key (station_id) references station(station_id)
+    foreign key (station_id) references station(station_id),
+    foreign key (path_id) references path(path_id)
 );
 
-insert into stations_of_path (station_id, sort_no)
-values 
-    (1, 1),
-    (2, 2),
-    (3, 3);
+
+
+
 
 
 -- get all needed path-rides of a workday / schoolday / ..
@@ -83,29 +74,6 @@ create table if not exists timetable (
     foreign key (category_id) references category(category_id),
     foreign key (path_id) references path(path_id)
 );
-
-insert into timetable(category_id, path_id, start_time)
-values
-    (
-        (select category_id from category where name = 'workday'),
-        (select path_id from path where path_description = 'A -> B -> C'),
-        '8:00'
-    ),
-    (
-        (select category_id from category where name = 'workday'),
-        (select path_id from path where path_description = 'C -> B -> A'),
-        '9:00'
-    ),
-    (
-        (select category_id from category where name = 'schoolday'),
-        (select path_id from path where path_description = 'A -> B -> C'),
-        '7:00'
-    ),
-    (
-        (select category_id from category where name = 'schoolday'),
-        (select path_id from path where path_description = 'C -> B -> A'),
-        '8:00'
-    );
 
 
 -- generate path rides for workday
