@@ -14,20 +14,16 @@ CREATE TABLE IF NOT EXISTS station (
     primary key (station_id)
 );
 
+create table if not exists route (
+    route_id serial,
+    route_number varchar(255),
+    description varchar(255),
 
--- select * from stations_of_path
--- where path_id = YY
--- order by sort_no asc;
-create table if not exists stations_of_path (
-    path_id serial,
-    station_id integer,
-    distance_from_previous integer,
-    time_from_previous integer,
-    sort_no integer,        -- used to keep order of path in db
-    primary key (path_id),
-    foreign key (path_id) references path(path_id)
+    primary key (route_id),
 );
 
+
+-- path belongs to exactly one route, easier than 1 to n
 create table if not exists path (
     path_id serial,
     route_id integer,
@@ -38,13 +34,17 @@ create table if not exists path (
     foreign key (route_id) references route(route_id)
 );
 
-
-create table if not exists route (
-    route_id serial,
-    route_number varchar(255),
-    description varchar(255),
-
-    primary key (route_id),
+-- select * from stations_of_path
+-- where path_id = YY
+-- order by sort_no asc;
+create table if not exists stations_of_path (
+    stations_of_path_id serial,
+    station_id integer,
+    distance_from_previous integer,
+    time_from_previous integer,
+    sort_no integer,        -- used to keep order of path in db
+    primary key (stations_of_path_id),
+    foreign key (station_id) references station(station_id)
 );
 
 
