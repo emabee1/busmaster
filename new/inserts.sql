@@ -88,23 +88,6 @@ insert into bus(licence_plate_number)
 values ('BZ-BUS1');
 
 
--- generate rides for 05.05.2019 - workday and insert into planned_rides with shift_day = null
-insert into planned_ride(path_ride_id, date, shift_day_id)
-select path_ride_id, '05.05.2019' as date, null as shift_day_id
-from timetable inner join path on timetable.path_id = path.path_id
-where timetable.category_id = (select category_id from category where name = 'workday');
-
--- generate rides for 06.05.2019 - workday and insert into planned_rides with shift_day = null
-insert into planned_ride(path_ride_id, date, shift_day_id)
-select path_ride_id, '06.05.2019' as date, null as shift_day_id
-from timetable inner join path on timetable.path_id = path.path_id
-where timetable.category_id = (select category_id from category where name = 'workday');
-
-
--- show all planed rides
-select * from planned_ride;
-
-
 -- create shift for 05.05.2019 with bus1
 insert into shift_day(bus_id, category_id, date)
 values (
@@ -112,11 +95,6 @@ values (
          (select category_id from category where name = 'workday'),
         '05.05.2019'
        );
-
--- manually assign rides to shift_day 1 (-> use case)
-update planned_ride
-set shift_day_id = 1
-where planned_ride_id = 11 or planned_ride_id = 12;
 
 
 -- create another shift for 06.05.2019 with bus1 (shift_day_id = 2)
@@ -135,19 +113,6 @@ set shift_day_id = 2
 where (path_ride_id in (select path_ride_id from planned_ride P where P.shift_day_id = 1)) and date = '06.05.2019';
 
 
--- show all planned rides with details
-select planned_ride_id, planned_ride.date, route.route_number, path.path_description, start_time, required_capacity, name as category, planned_ride.shift_day_id, bus.bus_id, licence_plate_number
-from planned_ride
-  inner join timetable on planned_ride.path_ride_id = timetable.path_ride_id
-  inner join category on category.category_id = timetable.category_id
-  inner join path on timetable.path_id = path.path_id
-  inner join route on path.route_id = route.route_id
-  left outer join shift_day on planned_ride.shift_day_id = shift_day.shift_day_id
-  left outer join bus on shift_day.bus_id = bus.bus_id
-  order by planned_ride.date asc;
-
-select * from timetable;
-
 
 
 -- first param: date, second: category_name
@@ -161,18 +126,13 @@ create function generate_rides(date date, category_name text) returns void
 language sql;
 
 
--- call generate_rides function
-select generate_rides('3.3.2019', 'workday');
-
--- show all planed rides
-select * from planned_ride;
 
 -- first param: old shift_day_id (template), second: new shift_day_id (must already exist), third: date of day (rides must already be generated before calling this!)
 create function apply_shift_day_template(template_shift_day_id integer, new_shift_day_id integer, date_ date) returns void
   AS $$
     update planned_ride
     set shift_day_id = new_shift_day_id
-  where (path_ride_id in (select path_ride_id from planned_ride P where P.shift_day_id = template_shift_day_id)) and date = date;
+  where (path_ride_id in (select path_ride_id from planned_ride P where P.shift_day_id = template_shift_day_id)) and date = date_;
   $$
 language sql;
 
@@ -183,10 +143,30 @@ select generate_rides('3.3.2019', 'workday');
 select generate_rides('4.3.2019', 'workday');
 select generate_rides('5.3.2019', 'workday');
 
+-- manually assign rides to shift_day 1 (-> use case)
+update planned_ride
+set shift_day_id = 1
+where planned_ride_id = 1 or planned_ride_id = 12;
 
-select apply_shift_day_template(1, 2, '4.3.2019');
-select * from planned_ride;
 
+
+
+-- apply shift_day with id=1 to shift_Day with id=2 on 5.3.2019
+select apply_shift_day_template(1, 2, '5.3.2019');
+
+
+-- show all planned rides with details
+select planned_ride_id, planned_ride.date, route.route_number, path.path_description, start_time, required_capacity, name as category, planned_ride.shift_day_id, bus.bus_id, licence_plate_number
+from planned_ride
+  inner join timetable on planned_ride.path_ride_id = timetable.path_ride_id
+  inner join category on category.category_id = timetable.category_id
+  inner join path on timetable.path_id = path.path_id
+  inner join route on path.route_id = route.route_id
+  left outer join shift_day on planned_ride.shift_day_id = shift_day.shift_day_id
+  left outer join bus on shift_day.bus_id = bus.bus_id
+  order by planned_ride.date asc;
+
+select * from timetable;
 
 
 
