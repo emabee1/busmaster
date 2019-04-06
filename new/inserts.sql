@@ -89,20 +89,22 @@ values ('BZ-BUS1');
 
 
 -- create shift for 05.05.2019 with bus1
-insert into shift_day(bus_id, category_id, date)
+insert into shift_day(bus_id, category_id, date, name)
 values (
          (select bus_id from bus where licence_plate_number = 'BZ-BUS1'),
          (select category_id from category where name = 'workday'),
-        '05.05.2019'
+        '05.05.2019',
+        'New bus in the haselstauden area'
        );
 
 
 -- create another shift for 06.05.2019 with bus1 (shift_day_id = 2)
-insert into shift_day(bus_id, category_id, date)
+insert into shift_day(bus_id, category_id, date, name)
 values (
          (select bus_id from bus where licence_plate_number = 'BZ-BUS1'),
          (select category_id from category where name = 'workday'),
-        '06.05.2019'
+        '06.05.2019',
+        'Old bus in the schoren area'
        );
 
 
@@ -156,7 +158,7 @@ select apply_shift_day_template(1, 2, '5.3.2019');
 
 
 -- show all planned rides with details
-select planned_ride_id, planned_ride.date, route.route_number, path.path_description, start_time, required_capacity, name as category, planned_ride.shift_day_id, bus.bus_id, licence_plate_number
+select planned_ride_id, planned_ride.date, route.route_number, path.path_description, start_time, required_capacity, category.name as category, planned_ride.shift_day_id, bus.bus_id, licence_plate_number, shift_day.name as shift_day_name
 from planned_ride
   inner join timetable on planned_ride.path_ride_id = timetable.path_ride_id
   inner join category on category.category_id = timetable.category_id
@@ -167,10 +169,3 @@ from planned_ride
   order by planned_ride.date asc;
 
 select * from timetable;
-
-
-
-
-
-
-

@@ -1,3 +1,15 @@
+drop table if exists suspension;
+drop table if exists planned_ride;
+drop table if exists shift_day;
+drop table if exists bus;
+drop table if exists timetable;
+drop table if exists stations_of_path;
+drop table if exists path;
+drop table if exists route;
+drop table if exists station;
+drop table if exists category;
+
+
 create table if not exists category (
     category_id serial,
     name varchar(255) not null,
@@ -7,12 +19,14 @@ create table if not exists category (
 insert into category(name)
 values('workday'), ('schoolday'), ('saturday'), ('sunday_holiday');
 
-CREATE TABLE IF NOT EXISTS station (
+
+create table if not exists station (
     station_id serial,
     station_name varchar(255) not null,
     location_description varchar(255),
     primary key (station_id)
 );
+
 
 create table if not exists route (
     route_id serial,
@@ -22,16 +36,19 @@ create table if not exists route (
     primary key (route_id)
 );
 
+
 -- path belongs to exactly one route, easier than 1 to n
 create table if not exists path (
     path_id serial,
     route_id integer not null,
-    category_id integer not null,    --needed because a path might be different depending on workday / schoolday / ..
+    -- needed because a path might be different depending on workday / schoolday / ..
+    category_id integer not null,
     path_description varchar(255),
 
     primary key (path_id),
     foreign key (route_id) references route(route_id)
 );
+
 
 -- select * from stations_of_path
 -- where path_id = YY
@@ -48,21 +65,20 @@ create table if not exists stations_of_path (
     foreign key (path_id) references path(path_id)
 );
 
+
 -- Timetable: hier werden Startzeiten für Pfade hinterlegt, abhängig von Category (Wochenende, Werktag, ..)
--- -> daraus lassen sich alle benötigten path_rides generieren pro tag und kategorie 
+-- -> daraus lassen sich alle benötigten path_rides generieren pro tag und kategorie
 -- Bsp:
 -- generate path rides for workday
--- select current_date, * 
+-- select current_date, *
 -- from timetable
 -- where category_id = (select category_id from category where name = 'workday');
-
 create table if not exists timetable (
     path_ride_id serial,
     category_id integer not null,
     path_id integer not null,
     start_time time not null,
     required_capacity integer,
-
     primary key (path_ride_id),
     foreign key (category_id) references category(category_id),
     foreign key (path_id) references path(path_id)
@@ -78,14 +94,20 @@ create table if not exists bus (
     current_km integer,
     primary key (bus_id),
     constraint current_km_gt_zero check (current_km >= 0),
-    constraint capacity_gt_zero check (capacity >= 0)
+    constraint capacity_gt_zero check (capacity >= 0),
+    constraint seats_gt_zero check (seats >= 0),
+    constraint capacity_gt_seats check (capacity >= seats)
 );
+
 
 create table if not exists shift_day (
     shift_day_id serial,
     bus_id integer,
     category_id integer,
-	date date,
+    -- each combination of date and name SHOULD be unique for a better overview
+    -- it's not a must, the user is responsible for it
+	  date date not null,
+    name varchar(255) not null,
     primary key (shift_day_id),
     foreign key (bus_id) references bus(bus_id),
     foreign key (category_id) references category(category_id)
@@ -96,10 +118,9 @@ create table if not exists shift_day (
 create table if not exists planned_ride (
     planned_ride_id serial,
     -- this path_ride represents a path + category + start_time + needed capacity
-    path_ride_id integer,       
+    path_ride_id integer,
     date date,
     shift_day_id integer,
-
     primary key(planned_ride_id),
     foreign key(shift_day_id) references shift_day(shift_day_id),
     foreign key(path_ride_id) references timetable(path_ride_id)
@@ -116,4 +137,3 @@ create table if not exists suspension (
     foreign key (bus_id) references bus(bus_id),
     constraint start_date_before_end_date check (end_date >= start_date)
 );
-
