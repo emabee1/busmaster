@@ -133,7 +133,7 @@ select apply_shift_day_template(1, 2, '5.3.2019');
 
 
 -- show all planned rides with details
-select planned_ride_id, planned_ride.date, route.route_number, path.path_description, start_time, required_capacity, category.name as category, planned_ride.shift_day_id, bus.bus_id, licence_plate_number, shift_day.name as shift_day_name
+select planned_ride_id, planned_ride.date, route.route_number, path.path_description, start_time, required_capacity, category.name as category, planned_ride.shift_day_id, shift_day.name, bus.bus_id, licence_plate_number, shift_day.name as shift_day_name
 from planned_ride
   inner join timetable on planned_ride.path_ride_id = timetable.path_ride_id
   inner join category on category.category_id = timetable.category_id
