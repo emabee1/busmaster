@@ -115,31 +115,6 @@ set shift_day_id = 2
 where (path_ride_id in (select path_ride_id from planned_ride P where P.shift_day_id = 1)) and date = '06.05.2019';
 
 
-
-
--- first param: date, second: category_name
-create function generate_rides(date date, category_name text) returns void
-  AS $$
-    insert into planned_ride(path_ride_id, date, shift_day_id)
-    select path_ride_id, date as date, null as shift_day_id
-    from timetable inner join path on timetable.path_id = path.path_id
-    where timetable.category_id = (select category_id from category where name = category_name);
-  $$
-language sql;
-
-
-
--- first param: old shift_day_id (template), second: new shift_day_id (must already exist), third: date of day (rides must already be generated before calling this!)
-create function apply_shift_day_template(template_shift_day_id integer, new_shift_day_id integer, date_ date) returns void
-  AS $$
-    update planned_ride
-    set shift_day_id = new_shift_day_id
-  where (path_ride_id in (select path_ride_id from planned_ride P where P.shift_day_id = template_shift_day_id)) and date = date_;
-  $$
-language sql;
-
-
-
 -- call generate_rides function
 select generate_rides('3.3.2019', 'workday');
 select generate_rides('4.3.2019', 'workday');
