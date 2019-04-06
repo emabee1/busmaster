@@ -97,7 +97,7 @@ create table if not exists bus (
     current_km integer,
     primary key (bus_id),
     constraint current_km_gt_zero check (current_km >= 0),
-    constraint capacity_gt_zero check (capacity >= 0),
+    constraint capacity_gt_zero check (capacity > 0),
     constraint seats_gt_zero check (seats >= 0),
     constraint capacity_gt_seats check (capacity >= seats)
 );
