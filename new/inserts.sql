@@ -84,8 +84,8 @@ values
     );
 
 -- create new bus
-insert into bus(licence_plate_number)
-values ('BZ-BUS1');
+insert into bus(licence_plate_number, capacity, seats, operational_area, current_km)
+values ('B-BUS1', 20, 12, 'Schülerfahrten', 29010);
 
 
 -- create shift for 05.05.2019 with bus1
