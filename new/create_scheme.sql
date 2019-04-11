@@ -88,9 +88,12 @@ create table if not exists bus (
 -- muss aber nicht.
 create table if not exists category_template
 (
-    category_template_id serial,
-    bus_id  integer,
+    category_template_id serial unique ,
+    bus_id integer,
+    category_id integer not null unique ,
+    name varchar(255) not null,
     primary key (category_template_id),
+    foreign key (category_id) references category(category_id),
     foreign key (bus_id) references bus (bus_id)
 );
 
