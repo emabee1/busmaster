@@ -106,7 +106,6 @@ from path_ride
     inner join path on path_ride.path_id = path.path_id
     inner join bus on shift_day_template.bus_id = bus.bus_id;
 
-----------------------------------------------------
 
 
 select generate_rides('4.12.2019', 'workday');
@@ -137,3 +136,13 @@ from planned_ride
   order by planned_ride.date asc;
 
 select * from timetable;
+
+select *
+from planned_ride
+inner join path_ride on planned_ride.path_ride_id = path_ride.path_ride_id
+left outer join shift_day_template on path_ride.shift_day_template_id = shift_day_template.shift_day_template_id
+where date = '04.12.2019';
+
+
+
+
