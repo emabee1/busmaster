@@ -1,15 +1,16 @@
 drop function if exists generate_rides;
 drop function if exists apply_shift_day_template;
-drop table if exists suspension;
-drop table if exists planned_ride;
-drop table if exists shift_day;
-drop table if exists bus;
-drop table if exists timetable;
-drop table if exists stations_of_path;
-drop table if exists path;
-drop table if exists route;
-drop table if exists station;
-drop table if exists category;
+drop table if exists suspension cascade;
+drop table if exists planned_ride cascade;
+drop table if exists shift_day cascade;
+drop table if exists shift_day_template cascade;
+drop table if exists bus cascade;
+drop table if exists path_ride cascade;
+drop table if exists stations_of_path cascade;
+drop table if exists path cascade;
+drop table if exists route cascade;
+drop table if exists station cascade;
+drop table if exists category cascade;
 
 
 create table if not exists category (
@@ -68,26 +69,6 @@ create table if not exists stations_of_path (
     foreign key (path_id) references path(path_id)
 );
 
-
--- Timetable: hier werden Startzeiten für Pfade hinterlegt, abhängig von Category (Wochenende, Werktag, ..)
--- -> daraus lassen sich alle benötigten path_rides generieren pro tag und kategorie
--- Bsp:
--- generate path rides for workday
--- select current_date, *
--- from timetable
--- where category_id = (select category_id from category where name = 'workday');
-create table if not exists timetable (
-    path_ride_id serial,
-    category_id integer not null,
-    path_id integer not null,
-    start_time time not null,
-    required_capacity integer,
-    primary key (path_ride_id),
-    foreign key (category_id) references category(category_id),
-    foreign key (path_id) references path(path_id)
-);
-
-
 create table if not exists bus (
     bus_id serial,
     licence_plate_number varchar(7),
@@ -100,6 +81,42 @@ create table if not exists bus (
     constraint capacity_gt_zero check (capacity > 0),
     constraint seats_gt_zero check (seats >= 0),
     constraint capacity_gt_seats check (capacity >= seats)
+);
+
+-- Ist bei einem Timetable (path_ride) eine category_template hinterlegt, können damit automatisch
+-- Shift Day´s für eine bestimmte Kategorie erzeugt werden (ganz oder teilweise). Der Bus kann gesetzt werden,
+-- muss aber nicht.
+create table if not exists shift_day_template
+(
+    shift_day_template_id serial,
+    bus_id integer,
+    category_id integer not null,
+    name varchar(255) not null,
+    primary key (shift_day_template_id),
+    foreign key (category_id) references category(category_id),
+    foreign key (bus_id) references bus (bus_id),
+    constraint bus_can_only_be_in_one_template_per_category unique (bus_id, category_id)
+);
+
+
+-- Timetable: hier werden Startzeiten für Pfade hinterlegt, abhängig von Category (Wochenende, Werktag, ..)
+-- -> daraus lassen sich alle benötigten path_rides generieren pro tag und kategorie
+-- Bsp:
+-- generate path rides for workday
+-- select current_date, *
+-- from timetable
+-- where category_id = (select category_id from category where name = 'workday');
+create table if not exists path_ride (
+    path_ride_id serial,
+    category_id integer not null,
+    path_id integer not null,
+    shift_day_template_id  integer,
+    start_time time not null,
+    required_capacity integer,
+    primary key (path_ride_id),
+    foreign key (category_id) references category(category_id),
+    foreign key (path_id) references path(path_id),
+    foreign key (shift_day_template_id) references shift_day_template (shift_day_template_id)
 );
 
 
@@ -126,7 +143,7 @@ create table if not exists planned_ride (
     shift_day_id integer,
     primary key(planned_ride_id),
     foreign key(shift_day_id) references shift_day(shift_day_id),
-    foreign key(path_ride_id) references timetable(path_ride_id)
+    foreign key(path_ride_id) references path_ride (path_ride_id)
 );
 
 
@@ -146,8 +163,8 @@ create function generate_rides(date date, category_name text) returns void
   AS $$
     insert into planned_ride(path_ride_id, date, shift_day_id)
     select path_ride_id, date as date, null as shift_day_id
-    from timetable inner join path on timetable.path_id = path.path_id
-    where timetable.category_id = (select category_id from category where name = category_name);
+    from path_ride inner join path on path_ride.path_id = path.path_id
+    where path_ride.category_id = (select category_id from category where name = category_name);
   $$
 language sql;
 

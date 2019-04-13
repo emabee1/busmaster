@@ -59,33 +59,57 @@ values
     );
 
 
+-- create new bus
+insert into bus(licence_plate_number, capacity, seats, operational_area, current_km)
+values
+       ('B-BUS1', 20, 12, 'Linienbus', 29010),
+       ('B-BUS2', 40, 20, 'Linienbus', 0);
+
+
+insert into shift_day_template(bus_id, category_id, name)
+values
+       (
+        (select bus_id from bus where licence_plate_number = 'B-BUS1'),
+        (select category_id from category where name = 'workday'),
+        'Shiftday 1 Template for Workday'
+       ),
+       (
+        (select bus_id from bus where licence_plate_number = 'B-BUS2'),
+        (select category_id from category where name = 'workday'),
+        'Shiftday 2 Template for Workday'
+       );
+
+
+
 -- create timetable for paths and categories
-insert into timetable(category_id, path_id, start_time)
+insert into path_ride(category_id, path_id, shift_day_template_id, start_time)
 values
     (
         (select category_id from category where name = 'workday'),
         (select path_id from path where path_description = 'A -> B -> C'),
+        (select shift_day_template_id from shift_day_template where name = 'Shiftday 1 Template for Workday'),
         '8:00'
     ),
     (
         (select category_id from category where name = 'workday'),
         (select path_id from path where path_description = 'C -> B -> A'),
+        (select shift_day_template_id from shift_day_template where name = 'Shiftday 2 Template for Workday'),
         '9:00'
-    ),
-    (
-        (select category_id from category where name = 'schoolday'),
-        (select path_id from path where path_description = 'A -> B -> C'),
-        '7:00'
-    ),
-    (
-        (select category_id from category where name = 'schoolday'),
-        (select path_id from path where path_description = 'C -> B -> A'),
-        '8:00'
     );
 
--- create new bus
-insert into bus(licence_plate_number, capacity, seats, operational_area, current_km)
-values ('B-BUS1', 20, 12, 'Schülerfahrten', 29010);
+
+
+select path_ride_id, start_time, required_capacity, shift_day_template.name, category.name as category, path_description, bus.licence_plate_number, bus.capacity
+from path_ride
+    inner join shift_day_template on path_ride.shift_day_template_id = shift_day_template.shift_day_template_id
+    inner join category on path_ride.category_id = category.category_id
+    inner join path on path_ride.path_id = path.path_id
+    inner join bus on shift_day_template.bus_id = bus.bus_id;
+
+
+
+select generate_rides('4.12.2019', 'workday');
+
 
 
 -- create shift for 05.05.2019 with bus1
@@ -98,49 +122,27 @@ values (
        );
 
 
--- create another shift for 06.05.2019 with bus1 (shift_day_id = 2)
-insert into shift_day(bus_id, category_id, date, name)
-values (
-         (select bus_id from bus where licence_plate_number = 'BZ-BUS1'),
-         (select category_id from category where name = 'workday'),
-        '06.05.2019',
-        'Old bus in the schoren area'
-       );
-
-
--- reuse shift_day configuration of shift day one on 05.05.2019
--- and apply it to same rides on 06.05.2019 with shift_day id = 2
-update planned_ride
-set shift_day_id = 2
-where (path_ride_id in (select path_ride_id from planned_ride P where P.shift_day_id = 1)) and date = '06.05.2019';
-
-
--- call generate_rides function
-select generate_rides('3.3.2019', 'workday');
-select generate_rides('4.3.2019', 'workday');
-select generate_rides('5.3.2019', 'workday');
-
--- manually assign rides to shift_day 1 (-> use case)
-update planned_ride
-set shift_day_id = 1
-where planned_ride_id = 1 or planned_ride_id = 2;
-
-
-
-
--- apply shift_day with id=1 to shift_Day with id=2 on 5.3.2019
-select apply_shift_day_template(1, 2, '5.3.2019');
-
 
 -- show all planned rides with details
-select planned_ride_id, planned_ride.date, route.route_number, path.path_description, start_time, required_capacity, category.name as category, planned_ride.shift_day_id, shift_day.name, bus.bus_id, licence_plate_number, shift_day.name as shift_day_name
+select planned_ride_id, planned_ride.date, route.route_number, path.path_description, start_time, required_capacity, category.name as category, shift_day_template.name as template, planned_ride.shift_day_id, shift_day.name, bus.bus_id, licence_plate_number, shift_day.name as shift_day_name
 from planned_ride
-  inner join timetable on planned_ride.path_ride_id = timetable.path_ride_id
-  inner join category on category.category_id = timetable.category_id
-  inner join path on timetable.path_id = path.path_id
+  inner join path_ride on planned_ride.path_ride_id = path_ride.path_ride_id
+  inner join category on category.category_id = path_ride.category_id
+  inner join path on path_ride.path_id = path.path_id
   inner join route on path.route_id = route.route_id
   left outer join shift_day on planned_ride.shift_day_id = shift_day.shift_day_id
   left outer join bus on shift_day.bus_id = bus.bus_id
+  left outer join shift_day_template on path_ride.shift_day_template_id = shift_day_template.shift_day_template_id
   order by planned_ride.date asc;
 
 select * from timetable;
+
+select *
+from planned_ride
+inner join path_ride on planned_ride.path_ride_id = path_ride.path_ride_id
+left outer join shift_day_template on path_ride.shift_day_template_id = shift_day_template.shift_day_template_id
+where date = '04.12.2019';
+
+
+
+
