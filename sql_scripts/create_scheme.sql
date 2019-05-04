@@ -23,6 +23,8 @@ alter sequence if exists shift_day_template_shift_day_template_id_seq restart;
 alter sequence if exists station_station_id_seq restart;
 alter sequence if exists stations_of_path_stations_of_path_id_seq restart;
 alter sequence if exists suspension_suspended_id_seq restart;
+alter sequence if exists driver_driver_id_seq restart;
+alter sequence if exists driver_shift_driver_shift_id_seq restart;
 
 create table if not exists category (
     category_id serial,
@@ -161,7 +163,7 @@ create table if not exists driver (
 
 create table if not exists driver_shift (
     driver_shift_id serial,
-    driver integer,
+    driver_id integer,
     start_time time not null,
     end_time time not null,
     shift_day_id integer not null,
