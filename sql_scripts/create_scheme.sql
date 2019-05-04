@@ -168,6 +168,6 @@ create table if not exists driver_shift (
     end_time time not null,
     shift_day_id integer not null,
     primary key (driver_shift_id),
-    foreign key (driver) references driver(driver_id),
+    foreign key (driver_id) references driver(driver_id),
     foreign key (shift_day_id) references shift_day(shift_day_id)
 );
