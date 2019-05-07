@@ -48,7 +48,6 @@ create table if not exists route (
     route_id serial,
     route_number varchar(255) not null,
     description varchar(255),
-
     primary key (route_id)
 );
 
@@ -57,9 +56,10 @@ create table if not exists path (
     path_id serial,
     route_id integer,
     path_description varchar(255),
-
+    category_id integer,
     primary key (path_id),
-    foreign key (route_id) references route(route_id)
+    foreign key (route_id) references route(route_id),
+    foreign key (category_id) references category(category_id)
 );
 
 
