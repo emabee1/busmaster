@@ -195,10 +195,12 @@ create table if not exists charter_ride (
     driver_id_1 integer,
     driver_id_2 integer,
     bus_id integer,
+    customer_id integer,
     primary key (charter_ride_id),
     foreign key (driver_id_1) references driver(driver_id),
     foreign key (driver_id_2) references driver(driver_id),
-    foreign key (bus_id) references bus(bus_id)
+    foreign key (bus_id) references bus(bus_id),
+    foreign key (customer_id) references customer(customer_id)
 );
 
 create table if not exists equipment (
