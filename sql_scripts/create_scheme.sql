@@ -172,7 +172,7 @@ create table if not exists driver_shift (
     foreign key (shift_day_id) references shift_day(shift_day_id)
 );
 
-create table if not exists customer {
+create table if not exists customer (
     customer_id serial,
     titel varchar(255),
     firstname varchar(255) not null,
@@ -182,14 +182,14 @@ create table if not exists customer {
     phone varchar(30) not null,
     email varchar(255) not null,
    primary key (customer_id)
-}
+); 
 
-create table if not exists charter_ride {
+create table if not exists charter_ride (
     charter_ride_id serial,
     label varchar(255) not null,
     description varchar(2048),
-    from_date date not null,
-    to_date date not null,
+    from_timestamp timestamp with time zone not null,
+    to_timestamp timestamp with time zone not null,
     price money not null,
     status integer not null,
     driver_id_1 integer,
@@ -199,9 +199,9 @@ create table if not exists charter_ride {
     foreign key (driver_id_1) references driver(driver_id),
     foreign key (driver_id_2) references driver(driver_id),
     foreign key (bus_id) references bus(bus_id)
-}
+);
 
-create table if not exists equipment {
+create table if not exists equipment (
     equipment_id serial,
     label varchar(255) not null,
     description varchar(2048),
@@ -210,13 +210,13 @@ create table if not exists equipment {
     bus_id integer,
     primary key(equipment_id),
     foreign key (bus_id) references bus(bus_id)
-}
+);
 
-create table if not exists charter_ride_equipment{
+create table if not exists charter_ride_equipment(
     charter_ride_equipment_id serial,
     charter_ride_id integer not null,
     equipment_id integer not null,
     primary key (charter_ride_equipment_id),
     foreign key (charter_ride_id) references charter_ride(charter_ride_id),
     foreign key (equipment_id) references equipment(equipment_id)
-}
+);
