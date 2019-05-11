@@ -57,6 +57,7 @@ create table if not exists path (
     route_id integer,
     path_description varchar(255),
     category_id integer,
+    same_return BOOLEAN,
     primary key (path_id),
     foreign key (route_id) references route(route_id),
     foreign key (category_id) references category(category_id)
