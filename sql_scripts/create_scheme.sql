@@ -11,6 +11,7 @@ drop table if exists station cascade;
 drop table if exists category cascade;
 drop table if exists driver cascade;
 drop table if exists driver_shift cascade;
+drop table if exists charter_ride cascade;
 
 alter sequence if exists bus_bus_id_seq restart;
 alter sequence if exists category_category_id_seq restart;
@@ -25,6 +26,7 @@ alter sequence if exists stations_of_path_stations_of_path_id_seq restart;
 alter sequence if exists suspension_suspended_id_seq restart;
 alter sequence if exists driver_driver_id_seq restart;
 alter sequence if exists driver_shift_driver_shift_id_seq restart;
+alter sequence if exists charter_ride_id_seq restart;
 
 create table if not exists category (
     category_id serial,
@@ -183,7 +185,7 @@ create table if not exists customer (
     phone varchar(30) not null,
     email varchar(255) not null,
    primary key (customer_id)
-); 
+);
 
 create table if not exists charter_ride (
     charter_ride_id serial,
@@ -191,7 +193,7 @@ create table if not exists charter_ride (
     description varchar(2048),
     from_timestamp timestamp with time zone not null,
     to_timestamp timestamp with time zone not null,
-    price money not null,
+    price decimal(19,2) not null,
     status integer not null,
     driver_id_1 integer,
     driver_id_2 integer,
